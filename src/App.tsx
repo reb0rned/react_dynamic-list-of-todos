@@ -16,12 +16,16 @@ export const App: React.FC = () => {
   const [chosenTodo, setChosenTodo] = useState<Todo | null>(null);
   const [todos, setTodos] = useState<Todo[]>([]);
   const [filterBy, setFilterBy] = useState<FilterBy>(FilterBy.all);
+  const [errors, setErrors] = useState('');
   const [query, setQuery] = useState('');
 
   useEffect(() => {
     setLoading(true);
     getTodos()
       .then(todosData => setTodos(todosData))
+      .catch(err => {
+        setErrors(`Error, can't receive todos: ${err}`);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -66,12 +70,15 @@ export const App: React.FC = () => {
             </div>
 
             <div className="block">
+              {errors && <p className="notification is-danger">{errors}</p>}
               {loading && !todos.length && <Loader />}
-              <TodoList
-                todos={todosForView}
-                chosenTodo={chosenTodo}
-                setChosenTodo={setChosenTodo}
-              />
+              {!loading && !errors && (
+                <TodoList
+                  todos={todosForView}
+                  chosenTodo={chosenTodo}
+                  setChosenTodo={setChosenTodo}
+                />
+              )}
             </div>
           </div>
         </div>
